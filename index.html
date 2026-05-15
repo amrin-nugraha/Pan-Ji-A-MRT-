@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Preceptive arbitration nexus -Judgemental integrative </title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+:root {
+  --deep:#07060A; --bark:#110e18; --smoke:#1a1626;
+  --gold:#C9A84C; --gold-dim:#8a6d2f; --gold-pale:#f0d98a; --gold-ghost:rgba(201,168,76,.08);
+  --jade:#4aab78; --jade-dim:#2d6b4a; --jade-ghost:rgba(74,171,120,.08);
+  --amerta:#4a7db5; --amerta-dim:#1e3a5f; --amerta-ghost:rgba(74,125,181,.08);
+  --red:#c0392b; --red-dim:#8b2318;
+  --violet:#8b78ff; --violet-dim:#4a3a8a;
+  --parchment:#f0e8d5; --parchment-mid:rgba(240,232,213,.7); --parchment-dim:rgba(240,232,213,.42);
+  --rule:rgba(201,168,76,.18);
+  --room-keraton: var(--gold);
+  --room-pengadukan: var(--jade);
+  --room-mandala: var(--amerta);
+  --font-display:'Cinzel',serif;
+  --font-body:'Cormorant Garamond',serif;
+  --font-mono:'Space Mono',monospace;
+  --font-text:'EB Garamond',serif;
+  --rad:3px;
+  --trans:all .3s cubic-bezier(.4,0,.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--deep);color:var(--parchment);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;line-height:1.75}
+
+/* ═══════════════════════════════════════════════
+   GRAIN OVERLAY
+═══════════════════════════════════════════════ */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity:.6;
+}
+
+/* ═══════════════════════════════════════════════
+   STATUS RIBBON — persistent top bar
+═══════════════════════════════════════════════ */
+.ribbon{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:32px;background:rgba(7,6,10,.96);
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;gap:2rem;
+  font-family:var(--font-mono);font-size:.58rem;letter-spacing:.08em;
+}
+.ribbon-brand{color:var(--gold);font-weight:700;letter-spacing:.25em;white-space:nowrap}
+.ribbon-status-row{display:flex;align-items:center;gap:1.5rem;flex:1;justify-content:center;flex-wrap:wrap}
+.ribbon-stat{display:flex;align-items:center;gap:.4rem;color:var(--parchment-dim)}
+.ribbon-stat .dot{width:5px;height:5px;border-radius:50%;animation:pulse-dot 2.5s ease-in-out infinite}
+.dot-live{background:var(--jade);box-shadow:0 0 6px var(--jade)}
+.dot-warn{background:var(--gold);box-shadow:0 0 6px var(--gold)}
+.dot-idle{background:rgba(255,255,255,.2)}
+.ribbon-time{color:var(--parchment-dim);white-space:nowrap}
+
+/* ═══════════════════════════════════════════════
+   ROOM NAVIGATION
+═══════════════════════════════════════════════ */
+.room-nav{
+  position:fixed;top:32px;left:0;right:0;z-index:90;
+  background:rgba(17,14,24,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:stretch;height:56px;
+}
+.room-tab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:.8rem;
+  font-family:var(--font-display);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
+  cursor:pointer;border:none;background:transparent;color:var(--parchment-dim);
+  position:relative;transition:var(--trans);padding:0 1rem;
+}
+.room-tab::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:currentColor;transform:scaleX(0);transition:transform .3s ease}
+.room-tab.active{color:var(--room-color,var(--gold))}
+.room-tab.active::after{transform:scaleX(1)}
+.room-tab:hover:not(.active){color:rgba(240,232,213,.65)}
+.tab-numeral{font-size:.52rem;opacity:.5;font-family:var(--font-mono)}
+.tab-label-panji{font-size:.52rem;font-family:var(--font-body);font-style:italic;opacity:.5;margin-left:.2rem}
+.room-tab.r1{--room-color:var(--gold)}.room-tab.r2{--room-color:var(--jade)}.room-tab.r3{--room-color:var(--amerta)}
+
+/* ═══════════════════════════════════════════════
+   MAIN CANVAS
+═══════════════════════════════════════════════ */
+.canvas{position:relative;z-index:1;margin-top:88px;min-height:calc(100vh - 88px)}
+
+/* ═══════════════════════════════════════════════
+   ROOM PANELS
+═══════════════════════════════════════════════ */
+.room{display:none;animation:room-enter .4s ease both}
+.room.active{display:flex;flex-direction:column}
+@keyframes room-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════════════════════
+   ROOM HEADERS
+═══════════════════════════════════════════════ */
+.room-header{
+  padding:2.5rem 3rem 2rem;
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(to bottom,rgba(17,14,24,.6),transparent);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;
+}
+.room-header-left{display:flex;flex-direction:column;gap:.3rem}
+.room-eyebrow{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;opacity:.45;color:var(--accent-color)}
+.room-title{font-family:var(--font-display);font-size:2rem;font-weight:600;color:var(--accent-color);letter-spacing:.1em;line-height:1.1}
+.room-subtitle{font-family:var(--font-body);font-size:1rem;font-style:italic;color:var(--parchment-dim);margin-top:.2rem}
+.room-header-right{text-align:right;font-family:var(--font-mono);font-size:.58rem;color:var(--parchment-dim);line-height:2}
+
+/* ═══════════════════════════════════════════════
+   ═══ ROOM I · KERATON ═══
+═══════════════════════════════════════════════ */
+#room-keraton{--accent-color:var(--gold)}
+
+.keraton-body{display:grid;grid-template-columns:1fr 340px;gap:0;flex:1}
+.keraton-main{padding:2.5rem 3rem;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:2rem}
+.keraton-aside{padding:2rem;display:flex;flex-direction:column;gap:1.5rem;background:rgba(17,14,24,.4)}
+
+.form-section{display:flex;flex-direction:column;gap:1rem}
+.form-section-label{
+  font-family:var(--font-mono);font-size:.56rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold-dim);padding-bottom:.6rem;border-bottom:1px solid var(--rule);
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-group.full{grid-column:1/-1}
+.form-label{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.1em;color:var(--parchment-dim)}
+.form-input,.form-select,.form-textarea{
+  background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.22);
+  color:var(--parchment);font-family:var(--font-body);font-size:.95rem;
+  padding:.65rem .9rem;border-radius:var(--rad);transition:var(--trans);
+  outline:none;width:100%;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--gold);background:rgba(201,168,76,.05);
+  box-shadow:0 0 0 2px rgba(201,168,76,.08);
+}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23C9A84C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .8rem center;padding-right:2.2rem;cursor:pointer}
+.form-select option{background:var(--smoke)}
+.form-textarea{resize:vertical;min-height:80px;font-family:var(--font-body);line-height:1.6}
+
+.tag-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem}
+.tag-chip{
+  font-family:var(--font-mono);font-size:.54rem;letter-spacing:.06em;
+  padding:.2rem .65rem;border:1px solid var(--rule);border-radius:20px;
+  cursor:pointer;transition:var(--trans);color:var(--parchment-dim);
+}
+.tag-chip:hover,.tag-chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-ghost)}
+.tag-chip.jade.active{border-color:var(--jade);color:var(--jade);background:var(--jade-ghost)}
+
+.feudal-radar{
+  border:1px solid var(--rule);padding:1.2rem 1.4rem;background:rgba(17,14,24,.5);
+}
+.feudal-radar-title{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:1rem}
+.radar-bars{display:flex;flex-direction:column;gap:.7rem}
+.radar-bar{display:flex;flex-direction:column;gap:.3rem}
+.radar-bar-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.53rem;color:var(--parchment-dim)}
+.radar-track{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.radar-fill{height:100%;border-radius:2px;transition:width .6s ease;background:var(--fill-color)}
+
+.aside-section{display:flex;flex-direction:column;gap:.8rem}
+.aside-title{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--parchment-dim)}
+.panji-hint{
+  border:1px solid var(--rule);padding:1rem;background:rgba(201,168,76,.03);
+  font-size:.9rem;font-style:italic;color:var(--parchment-dim);line-height:1.7;
+}
+.panji-hint strong{color:var(--gold);font-style:normal}
+
+.archetype-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.archetype-btn{
+  padding:.7rem .5rem;border:1px solid var(--rule);background:transparent;
+  cursor:pointer;transition:var(--trans);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:.3rem;color:var(--parchment-dim);
+}
+.archetype-btn:hover,.archetype-btn.active{background:var(--arch-bg,rgba(201,168,76,.06));border-color:var(--arch-color,var(--gold));color:var(--arch-color,var(--gold))}
+.archetype-icon{font-size:1.2rem;line-height:1}
+.archetype-name{font-family:var(--font-display);font-size:.58rem;letter-spacing:.15em}
+.archetype-sub{font-size:.65rem;font-style:italic;opacity:.55}
+
+.btn-primary{
+  background:var(--gold);color:var(--deep);border:none;
+  font-family:var(--font-display);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  padding:.85rem 2.5rem;cursor:pointer;transition:var(--trans);border-radius:var(--rad);
+  display:inline-flex;align-items:center;gap:.6rem;
+}
+.btn-primary:hover{background:var(--gold-pale);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,.3)}
+.btn-secondary{
+  background:transparent;color:var(--parchment-dim);border:1px solid var(--rule);
+  font-family:var(--font-mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.7rem 1.5rem;cursor:pointer;transition:var(--trans);border-radius:var(--rad);
+}
+.btn-secondary:hover{border-color:var(--gold-dim);color:var(--parchment)}
+.btn-row{display:flex;align-items:center;gap:1rem;margin-top:1rem}
+
+/* ═══════════════════════════════════════════════
+   ═══ ROOM II · PENGADUKAN ═══
+═══════════════════════════════════════════════ */
+#room-pengadukan{--accent-color:var(--jade)}
+
+.pengadukan-layout{display:grid;grid-template-columns:1fr 340px;gap:0;flex:1}
+.pengadukan-main{padding:2rem 3rem;display:flex;flex-direction:column;gap:2rem;border-right:1px solid var(--rule)}
+.pengadukan-aside{background:rgba(17,14,24,.4);padding:2rem;display:flex;flex-direction:column;gap:1.5rem;overflow-y:auto;max-height:calc(100vh - 200px)}
+
+/* Tension Pair */
+.tension-pair{
+  border:1px solid var(--rule);background:rgba(17,14,24,.5);overflow:hidden;
+}
+.tension-pair-header{
+  padding:1rem 1.4rem;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(201,168,76,.03);
+}
+.tension-pair-title{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.15em;color:var(--gold-dim);text-transform:uppercase}
+.tension-score{font-family:var(--font-mono);font-size:.58rem;color:var(--jade)}
+.tension-score span{font-size:1.1rem;font-weight:700}
+.tension-columns{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule)}
+.tension-col{padding:1.2rem 1.4rem;background:var(--deep)}
+.tension-col-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.6rem}
+.tension-col.public .tension-col-label{color:var(--gold)}
+.tension-col.contra .tension-col-label{color:var(--amerta)}
+.tension-col-text{font-size:.9rem;line-height:1.7;color:var(--parchment-mid);font-style:italic}
+.tension-markers{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.7rem}
+.marker-tag{font-family:var(--font-mono);font-size:.5rem;padding:.15rem .5rem;border-radius:20px}
+.marker-tag.feudal{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.25)}
+.marker-tag.concept{background:rgba(74,125,181,.12);color:var(--amerta);border:1px solid rgba(74,125,181,.25)}
+.tension-gap{
+  padding:.8rem 1.4rem;background:rgba(74,171,120,.04);border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:.8rem;
+}
+.tension-gap-label{font-family:var(--font-mono);font-size:.52rem;color:var(--jade);letter-spacing:.1em}
+.tension-gap-text{font-size:.85rem;font-style:italic;color:var(--parchment-dim)}
+
+/* Refine prompt */
+.refine-bar{
+  border:1px solid var(--rule);background:rgba(17,14,24,.5);
+  display:flex;align-items:stretch;overflow:hidden;
+}
+.refine-input{
+  flex:1;background:transparent;border:none;outline:none;
+  padding:.85rem 1.2rem;font-family:var(--font-body);font-size:.95rem;color:var(--parchment);
+}
+.refine-input::placeholder{color:rgba(240,232,213,.25);font-style:italic}
+.refine-btn{
+  background:var(--jade-dim);border:none;color:var(--parchment);padding:.85rem 1.2rem;
+  font-family:var(--font-mono);font-size:.58rem;letter-spacing:.1em;cursor:pointer;
+  transition:var(--trans);display:flex;align-items:center;gap:.4rem;white-space:nowrap;
+}
+.refine-btn:hover{background:var(--jade)}
+
+/* Geo map placeholder */
+.geo-panel{
+  border:1px solid var(--rule);overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.geo-header{
+  padding:.8rem 1.2rem;border-bottom:1px solid var(--rule);background:rgba(74,171,120,.04);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.geo-title{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--jade-dim)}
+.geo-controls{display:flex;gap:.4rem}
+.geo-btn{
+  font-family:var(--font-mono);font-size:.5rem;padding:.2rem .55rem;
+  border:1px solid var(--rule);background:transparent;color:var(--parchment-dim);
+  cursor:pointer;transition:var(--trans);border-radius:2px;
+}
+.geo-btn.active,.geo-btn:hover{border-color:var(--jade);color:var(--jade)}
+.geo-map-area{
+  height:200px;background:var(--bark);position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.geo-svg-wrap{width:100%;height:100%}
+
+/* ═══════════════════════════════════════════════
+   STATS ROW
+═══════════════════════════════════════════════ */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.stat-cell{background:var(--bark);padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.3rem}
+.stat-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.12em;color:var(--parchment-dim)}
+.stat-value{font-family:var(--font-display);font-size:1.5rem;color:var(--accent,var(--gold))}
+.stat-sub{font-size:.78rem;font-style:italic;color:var(--parchment-dim);opacity:.65}
+
+/* Mini tension graph (SVG-based) */
+.tension-graph-wrap{border:1px solid var(--rule);overflow:hidden}
+.tension-graph-header{
+  padding:.75rem 1.2rem;border-bottom:1px solid var(--rule);background:rgba(17,14,24,.5);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.tg-title{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--jade-dim)}
+.tg-legend{display:flex;gap:1rem;font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim)}
+.tg-legend-item{display:flex;align-items:center;gap:.35rem}
+.tg-dot{width:6px;height:6px;border-radius:50%}
+.tension-graph-canvas{padding:.8rem 1rem 1rem;background:var(--deep)}
+
+/* Aside peer queue */
+.peer-queue-item{
+  border:1px solid var(--rule);padding:.9rem 1rem;background:rgba(17,14,24,.5);
+  display:flex;flex-direction:column;gap:.3rem;cursor:pointer;transition:var(--trans);
+}
+.peer-queue-item:hover{border-color:var(--jade-dim);background:rgba(74,171,120,.04)}
+.pq-pair-id{font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim);letter-spacing:.05em}
+.pq-gap-label{font-size:.82rem;font-style:italic;color:var(--parchment-mid)}
+.pq-status{display:flex;align-items:center;gap:.4rem;margin-top:.2rem}
+.pq-status-dot{width:5px;height:5px;border-radius:50%}
+.pq-status-text{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.08em}
+.pq-pending .pq-status-dot{background:var(--gold)}
+.pq-pending .pq-status-text{color:var(--gold)}
+.pq-review .pq-status-dot{background:var(--amerta)}
+.pq-review .pq-status-text{color:var(--amerta)}
+
+/* Dalang rail */
+.dalang-rail{
+  border:1px solid var(--rule);background:rgba(7,6,10,.8);
+}
+.dalang-rail-header{
+  padding:.8rem 1rem;border-bottom:1px solid var(--rule);background:rgba(139,120,255,.04);
+  display:flex;align-items:center;gap:.5rem;
+}
+.dalang-rail-title{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.2em;color:var(--violet);text-transform:uppercase}
+.dalang-trace{padding:.8rem 1rem;display:flex;flex-direction:column;gap:.5rem;max-height:180px;overflow-y:auto}
+.trace-line{font-family:var(--font-mono);font-size:.56rem;color:var(--parchment-dim);line-height:1.6;padding-left:1rem;position:relative}
+.trace-line::before{content:'›';position:absolute;left:0;color:var(--violet);opacity:.5}
+.trace-line.highlight{color:var(--jade)}
+.trace-line.warn{color:var(--gold)}
+
+/* ═══════════════════════════════════════════════
+   ═══ ROOM III · MANDALA ═══
+═══════════════════════════════════════════════ */
+#room-mandala{--accent-color:var(--amerta)}
+
+.mandala-body{padding:2rem 3rem;display:flex;flex-direction:column;gap:2rem}
+.mandala-grid-top{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.mandala-kpi{background:var(--bark);padding:1.4rem 1.6rem;display:flex;flex-direction:column;gap:.4rem;position:relative;overflow:hidden}
+.mandala-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-color)}
+.mandala-kpi.gold{--kpi-color:var(--gold)}.mandala-kpi.jade{--kpi-color:var(--jade)}.mandala-kpi.amerta{--kpi-color:var(--amerta)}.mandala-kpi.violet{--kpi-color:var(--violet)}
+.kpi-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.12em;color:var(--parchment-dim);text-transform:uppercase}
+.kpi-value{font-family:var(--font-display);font-size:2rem;line-height:1;margin:.2rem 0}
+.kpi-value.gold{color:var(--gold)}.kpi-value.jade{color:var(--jade)}.kpi-value.amerta{color:var(--amerta)}.kpi-value.violet{color:var(--violet)}
+.kpi-delta{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.05em}
+.kpi-delta.up{color:var(--jade)}.kpi-delta.down{color:var(--red)}
+.kpi-trend{margin-top:.5rem}
+
+.mandala-grid-mid{display:grid;grid-template-columns:1fr 1fr 340px;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.mandala-panel{background:var(--bark);display:flex;flex-direction:column}
+.mandala-panel-header{
+  padding:.85rem 1.4rem;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(17,14,24,.5);
+}
+.mandala-panel-title{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase}
+.mandala-panel-title.gold{color:var(--gold-dim)}.mandala-panel-title.jade{color:var(--jade-dim)}.mandala-panel-title.amerta{color:var(--amerta-dim)}
+.mandala-panel-body{padding:1.2rem 1.4rem;flex:1;display:flex;flex-direction:column;gap:1rem}
+
+/* Collection health */
+.coll-health-row{display:flex;flex-direction:column;gap:.6rem}
+.coll-health-item{display:grid;grid-template-columns:140px 1fr 60px;align-items:center;gap:.8rem}
+.coll-name-label{font-family:var(--font-mono);font-size:.56rem;color:var(--parchment-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coll-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.coll-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.coll-fill.gold{background:var(--gold)}.coll-fill.jade{background:var(--jade)}.coll-fill.amerta{background:var(--amerta)}.coll-fill.violet{background:var(--violet)}.coll-fill.red{background:var(--red)}
+.coll-count{font-family:var(--font-mono);font-size:.53rem;color:var(--parchment-dim);text-align:right}
+
+/* News cycle momentum */
+.news-cycle-list{display:flex;flex-direction:column;gap:.5rem}
+.news-cycle-item{display:flex;gap:.8rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.news-cycle-item:last-child{border-bottom:none}
+.nc-bar{width:3px;border-radius:2px;background:var(--nc-color,var(--gold));flex-shrink:0;align-self:stretch}
+.nc-body{flex:1;display:flex;flex-direction:column;gap:.2rem}
+.nc-id{font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim);letter-spacing:.05em}
+.nc-headline{font-size:.9rem;color:var(--parchment-mid);line-height:1.4}
+.nc-meta{display:flex;gap:.8rem;font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim)}
+.nc-vel{color:var(--nc-color)}
+
+/* Activity feed */
+.activity-feed{display:flex;flex-direction:column;gap:.4rem;max-height:220px;overflow-y:auto}
+.activity-item{display:flex;gap:.7rem;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+.activity-item:last-child{border-bottom:none}
+.act-time{font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim);white-space:nowrap;padding-top:.1rem}
+.act-body{flex:1}
+.act-text{font-size:.82rem;color:var(--parchment-mid);line-height:1.5}
+.act-tag{display:inline-block;font-family:var(--font-mono);font-size:.47rem;padding:.1rem .35rem;border-radius:2px;margin-top:.2rem}
+.act-tag.ingest{background:rgba(201,168,76,.1);color:var(--gold)}
+.act-tag.pair{background:rgba(74,171,120,.1);color:var(--jade)}
+.act-tag.review{background:rgba(74,125,181,.1);color:var(--amerta)}
+.act-tag.alert{background:rgba(192,57,43,.1);color:var(--red)}
+
+/* Mini SVG sparkline helper */
+.sparkline{overflow:visible}
+
+/* ═══════════════════════════════════════════════
+   ANNOTATIONS (UX PROPOSAL LAYER)
+═══════════════════════════════════════════════ */
+.ux-annotation{
+  background:rgba(139,120,255,.06);border:1px solid rgba(139,120,255,.2);
+  padding:.8rem 1rem;font-size:.8rem;font-style:italic;
+  color:rgba(180,165,255,.7);line-height:1.6;
+  border-left:3px solid var(--violet);margin-top:.5rem;
+}
+.ux-annotation-label{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.15em;text-transform:uppercase;color:var(--violet);opacity:.7;margin-bottom:.3rem;font-style:normal}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes pulse-dot{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes spin-slow{to{transform:rotate(360deg)}}
+@keyframes spin-rev{to{transform:rotate(-360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.blink{animation:blink 1.4s ease-in-out infinite}
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════ */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:2px}
+
+/* ═══════════════════════════════════════════════
+   MANDALA SVG INDICATOR
+═══════════════════════════════════════════════ */
+.system-mandala-wrap{display:flex;align-items:center;justify-content:center;padding:1rem;flex:1}
+.sys-mandala{filter:drop-shadow(0 0 12px rgba(74,125,181,.3))}
+#sys-ring-outer{animation:spin-slow 30s linear infinite;transform-origin:90px 90px}
+#sys-ring-inner{animation:spin-rev 20s linear infinite;transform-origin:90px 90px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     STATUS RIBBON
+═══════════════════════════════════════════════ -->
+<div class="ribbon">
+  <div class="ribbon-brand">Panji · NEXUS</div>
+  <div class="ribbon-status-row">
+    <div class="ribbon-stat"><div class="dot dot-live"></div>Qdrant: 6 collections live</div>
+    <div class="ribbon-stat"><div class="dot dot-live"></div>BGE-M3: active</div>
+    <div class="ribbon-stat"><div class="dot dot-live"></div>Dalang: idle</div>
+    <div class="ribbon-stat"><div class="dot dot-warn"></div>Peer queue: 7 pending</div>
+    <div class="ribbon-stat"><div class="dot dot-idle"></div>Neo4j: synced 08:14</div>
+  </div>
+  <div class="ribbon-time" id="live-clock">--:--:-- WIB</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ROOM NAVIGATION
+═══════════════════════════════════════════════ -->
+<nav class="room-nav">
+  <button class="room-tab r1 active" onclick="switchRoom('keraton',this)">
+    <span class="tab-numeral">I</span>
+    KERATON
+    <span class="tab-label-panji">· parameter input</span>
+  </button>
+  <button class="room-tab r2" onclick="switchRoom('pengadukan',this)">
+    <span class="tab-numeral">II</span>
+    PENGADUKAN
+    <span class="tab-label-panji">· analysis & tension</span>
+  </button>
+  <button class="room-tab r3" onclick="switchRoom('mandala',this)">
+    <span class="tab-numeral">III</span>
+    MANDALA
+    <span class="tab-label-panji">· live dashboard</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN CANVAS
+═══════════════════════════════════════════════ -->
+<div class="canvas">
+
+<!-- ══════════════════════════════════
+     ROOM I · KERATON
+     Where the inquiry is composed
+══════════════════════════════════ -->
+<section class="room active" id="room-keraton">
+  <div class="room-header">
+    <div class="room-header-left">
+      <div class="room-eyebrow">Room I · Penjuru Utara</div>
+      <div class="room-title">Keraton</div>
+      <div class="room-subtitle">Compose your inquiry — define domain, geography, and the claim to investigate</div>
+    </div>
+    <div class="room-header-right">
+      <div>Argumen Publik &amp; Kontra disiapkan di sini</div>
+      <div style="opacity:.4;font-size:.52rem">Seperti prasasti — parametermu adalah ikrar resmimu</div>
+    </div>
+  </div>
+
+  <div class="keraton-body">
+    <!-- MAIN FORM -->
+    <div class="keraton-main">
+
+      <!-- Section A: Domain & Geography -->
+      <div class="form-section">
+        <div class="form-section-label">A · Domain &amp; Geografi</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Primary Domain</label>
+            <select class="form-select">
+              <option value="">— pilih domain —</option>
+              <option>Kebijakan Publik & Demokrasi</option>
+              <option>Ekonomi & Perdagangan</option>
+              <option>Pertahanan & Geopolitik</option>
+              <option>Sosial & Identitas</option>
+              <option>Kesehatan & Ketahanan Pangan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Panji Zone</label>
+            <select class="form-select">
+              <option>Insular SEA (Kepulauan)</option>
+              <option>Mainland SEA (Daratan)</option>
+              <option>Both</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Country / Countries</label>
+            <div class="tag-row">
+              <div class="tag-chip active" onclick="toggleTag(this)">ID · Indonesia</div>
+              <div class="tag-chip" onclick="toggleTag(this)">TH · Thailand</div>
+              <div class="tag-chip" onclick="toggleTag(this)">VN · Vietnam</div>
+              <div class="tag-chip" onclick="toggleTag(this)">KH · Cambodia</div>
+              <div class="tag-chip" onclick="toggleTag(this)">LA · Laos</div>
+              <div class="tag-chip" onclick="toggleTag(this)">MY · Malaysia</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Temporal Focus</label>
+            <select class="form-select">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Custom news cycle</option>
+              <option>Historical comparison</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section B: The Claim -->
+      <div class="form-section">
+        <div class="form-section-label">B · Klaim / Argumen Publik yang Diselidiki</div>
+        <div class="form-group full">
+          <label class="form-label">Paraphrase the public argument or claim</label>
+          <textarea class="form-textarea" rows="3" placeholder="e.g. "Kebijakan ini adalah amanah rakyat yang tidak bisa diganggu gugat..." — tulis dalam bahasa sumber atau Indonesia"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Source Context (optional)</label>
+          <div class="form-input" style="display:flex;align-items:center;gap:.6rem;color:var(--parchment-dim)">
+            <span style="font-size:.8rem">⊕</span>
+            <span style="font-size:.85rem;font-style:italic">Paste URL, upload PDF, or select from news cycle → </span>
+          </div>
+        </div>
+
+        <!-- Feudal Marker Pre-detection -->
+        <div class="feudal-radar">
+          <div class="feudal-radar-title">Feudal Marker Pre-detection · Live as you type</div>
+          <div class="radar-bars">
+            <div class="radar-bar">
+              <div class="radar-bar-label"><span>divine_mandate</span><span>0.72</span></div>
+              <div class="radar-track"><div class="radar-fill" style="width:72%;--fill-color:var(--gold)"></div></div>
+            </div>
+            <div class="radar-bar">
+              <div class="radar-bar-label"><span>loyalty_appeal</span><span>0.58</span></div>
+              <div class="radar-track"><div class="radar-fill" style="width:58%;--fill-color:var(--gold)"></div></div>
+            </div>
+            <div class="radar-bar">
+              <div class="radar-bar-label"><span>populist_wangsit</span><span>0.85</span></div>
+              <div class="radar-track"><div class="radar-fill" style="width:85%;--fill-color:var(--red)"></div></div>
+            </div>
+            <div class="radar-bar">
+              <div class="radar-bar-label"><span>anti-meritocracy</span><span>0.31</span></div>
+              <div class="radar-track"><div class="radar-fill" style="width:31%;--fill-color:var(--jade)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="ux-annotation">
+          <div class="ux-annotation-label">UX Note · Live Detection</div>
+          As the analyst types the claim, the Dalang agent silently scores feudal markers. High <em>populist_wangsit</em> automatically weights the contra retrieval toward the Nagarakretagama and Panji cycle corpus.
+        </div>
+      </div>
+
+      <!-- Section C: Contra Anchors -->
+      <div class="form-section">
+        <div class="form-section-label">C · Contra Corpus Anchors (optional override)</div>
+        <div class="form-group full">
+          <label class="form-label">Force-include these contra sources</label>
+          <div class="tag-row">
+            <div class="tag-chip jade" onclick="toggleTag(this,'jade')">Nagarakretagama</div>
+            <div class="tag-chip jade" onclick="toggleTag(this,'jade')">Pararaton</div>
+            <div class="tag-chip jade" onclick="toggleTag(this,'jade')">Panji Cycles</div>
+            <div class="tag-chip jade" onclick="toggleTag(this,'jade')">Adiparwa</div>
+            <div class="tag-chip jade" onclick="toggleTag(this,'jade')">Colonial Archives</div>
+            <div class="tag-chip jade" onclick="toggleTag(this,'jade')">Academic SEA</div>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Minimum contra authority tier</label>
+          <select class="form-select" style="max-width:220px">
+            <option>Any</option>
+            <option>Secondary or above</option>
+            <option selected>Primary only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="btn-row">
+        <button class="btn-primary" onclick="switchRoom('pengadukan',document.querySelectorAll('.room-tab')[1])">
+          ⚡ Begin Pengadukan
+        </button>
+        <button class="btn-secondary">Save as Template</button>
+        <button class="btn-secondary">Load Previous</button>
+      </div>
+    </div>
+
+    <!-- ASIDE -->
+    <div class="keraton-aside">
+      <div class="aside-title">Panji Archetype · Pilih Perspektif</div>
+      <div class="archetype-grid">
+        <div class="archetype-btn active" style="--arch-color:var(--gold);--arch-bg:rgba(201,168,76,.06)">
+          <div class="archetype-icon">⛩</div>
+          <div class="archetype-name">Keraton</div>
+          <div class="archetype-sub">Policy & legitimacy</div>
+        </div>
+        <div class="archetype-btn" style="--arch-color:var(--jade);--arch-bg:rgba(74,171,120,.06)">
+          <div class="archetype-icon">⛵</div>
+          <div class="archetype-name">Pedagang</div>
+          <div class="archetype-sub">Narrative & trade</div>
+        </div>
+        <div class="archetype-btn" style="--arch-color:var(--violet);--arch-bg:rgba(139,120,255,.06)">
+          <div class="archetype-icon">🎭</div>
+          <div class="archetype-name">Dalang</div>
+          <div class="archetype-sub">Meta & research</div>
+        </div>
+        <div class="archetype-btn" style="--arch-color:var(--amerta);--arch-bg:rgba(74,125,181,.06)">
+          <div class="archetype-icon">☀</div>
+          <div class="archetype-name">Mandala</div>
+          <div class="archetype-sub">Analytics & pattern</div>
+        </div>
+      </div>
+
+      <div class="aside-section">
+        <div class="panji-hint">
+          <strong>Dalang melihat semua —</strong><br>
+          tapi hanya manusia yang memutuskan.<br><br>
+          Parametermu di ruang ini adalah <strong>prasasti</strong> — ikrar formal yang memandu retrieval. Semakin presisi klaimmu, semakin tajam pemetaan tegangan yang akan dihasilkan.
+        </div>
+      </div>
+
+      <div class="aside-section">
+        <div class="aside-title">Recent Inquiries</div>
+        <div style="display:flex;flex-direction:column;gap:.4rem">
+          <div class="peer-queue-item" style="cursor:pointer">
+            <div class="pq-pair-id">ID · KEBIJAKAN · 20260512</div>
+            <div class="pq-gap-label" style="font-size:.82rem">Wangsit vs Dharma Contract — HIPMI</div>
+            <div style="font-family:var(--font-mono);font-size:.5rem;color:var(--jade);margin-top:.2rem">✓ resolved · 3 pairs</div>
+          </div>
+          <div class="peer-queue-item" style="cursor:pointer">
+            <div class="pq-pair-id">ID · EKONOMI · 20260510</div>
+            <div class="pq-gap-label" style="font-size:.82rem">Sovereign AI vs Silicon Valley Metrics — Telkom</div>
+            <div style="font-family:var(--font-mono);font-size:.5rem;color:var(--gold);margin-top:.2rem">⧗ in review · 5 pairs</div>
+          </div>
+          <div class="peer-queue-item" style="cursor:pointer">
+            <div class="pq-pair-id">ID · SOSIAL · 20260508</div>
+            <div class="pq-gap-label" style="font-size:.82rem">Kreatif Ekonomi vs Feudal Patron — GEKRAF</div>
+            <div style="font-family:var(--font-mono);font-size:.5rem;color:var(--amerta);margin-top:.2rem">● pending · 8 pairs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     ROOM II · PENGADUKAN
+     Where tension surfaces and is refined
+══════════════════════════════════ -->
+<section class="room" id="room-pengadukan">
+  <div class="room-header">
+    <div class="room-header-left">
+      <div class="room-eyebrow">Room II · Pengadukan Amerta</div>
+      <div class="room-title">Pengadukan</div>
+      <div class="room-subtitle">Tension surfaces here — refine the analysis, explore geography, route to peer review</div>
+    </div>
+    <div class="room-header-right">
+      <div>Dalang: active · pair_id NC_20260512_007</div>
+      <div style="font-size:.52rem;opacity:.4">Cosine tension: <span style="color:var(--jade)">0.73</span> — high epistemic divide</div>
+    </div>
+  </div>
+
+  <div class="pengadukan-layout">
+    <div class="pengadukan-main">
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-cell"><div class="stat-label">Pairs Generated</div><div class="stat-value" style="--accent:var(--gold)">14</div><div class="stat-sub">this session</div></div>
+        <div class="stat-cell"><div class="stat-label">Avg Tension Score</div><div class="stat-value" style="--accent:var(--jade)">0.71</div><div class="stat-sub">cosine distance</div></div>
+        <div class="stat-cell"><div class="stat-label">Feudal Markers Hit</div><div class="stat-value" style="--accent:var(--red)">3</div><div class="stat-sub">wangsit · divine · loyalty</div></div>
+      </div>
+
+      <!-- Primary Tension Pair -->
+      <div class="tension-pair">
+        <div class="tension-pair-header">
+          <div class="tension-pair-title">Top Tension Pair · amerta_pair_kebijakan_ID_20260512_007</div>
+          <div class="tension-score">GAP <span>0.73</span> / 1.00</div>
+        </div>
+        <div class="tension-columns">
+          <div class="tension-col public">
+            <div class="tension-col-label">Argumen Publik · KOL1 · X/Twitter</div>
+            <div class="tension-col-text">"Kebijakan ini lahir dari amanah rakyat yang tidak bisa diganggu gugat — siapa pun yang menentangnya berarti menentang kehendak bangsa…"</div>
+            <div class="tension-markers">
+              <span class="marker-tag feudal">divine_mandate</span>
+              <span class="marker-tag feudal">loyalty_appeal</span>
+              <span class="marker-tag feudal">populist_wangsit</span>
+            </div>
+          </div>
+          <div class="tension-col contra">
+            <div class="tension-col-label">Contra · Nagarakretagama 1365 CE · Primary</div>
+            <div class="tension-col-text">Mandat pemimpin dalam tradisi mandala bersifat kontraktual — dharma seorang raja diukur dari kemakmuran rakyatnya, bukan dari pernyataan sepihak tentang kehendak ilahi…</div>
+            <div class="tension-markers">
+              <span class="marker-tag concept">dharma_governance</span>
+              <span class="marker-tag concept">mandala_state</span>
+              <span class="marker-tag concept">archipelagic_meritocracy</span>
+            </div>
+          </div>
+        </div>
+        <div class="tension-gap">
+          <div class="tension-gap-label">GAP LABEL</div>
+          <div class="tension-gap-text">wangsit_vs_dharma_contract · Klaim legitimasi ilahi vs. mandat kontraktual historis</div>
+        </div>
+      </div>
+
+      <!-- Tension Graph -->
+      <div class="tension-graph-wrap">
+        <div class="tension-graph-header">
+          <div class="tg-title">Tension Distribution · All 14 Pairs This Session</div>
+          <div class="tg-legend">
+            <div class="tg-legend-item"><div class="tg-dot" style="background:var(--gold)"></div>Public</div>
+            <div class="tg-legend-item"><div class="tg-dot" style="background:var(--amerta)"></div>Contra</div>
+            <div class="tg-legend-item"><div class="tg-dot" style="background:var(--jade)"></div>Gap Score</div>
+          </div>
+        </div>
+        <div class="tension-graph-canvas">
+          <svg width="100%" height="120" viewBox="0 0 580 120" preserveAspectRatio="xMidYMid meet">
+            <!-- Grid lines -->
+            <line x1="0" y1="24" x2="580" y2="24" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+            <line x1="0" y1="60" x2="580" y2="60" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+            <line x1="0" y1="96" x2="580" y2="96" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+            <!-- Y-axis labels -->
+            <text x="4" y="28" fill="rgba(240,232,213,.25)" font-size="8" font-family="'Space Mono',monospace">1.0</text>
+            <text x="4" y="64" fill="rgba(240,232,213,.25)" font-size="8" font-family="'Space Mono',monospace">0.5</text>
+            <text x="4" y="100" fill="rgba(240,232,213,.25)" font-size="8" font-family="'Space Mono',monospace">0.0</text>
+            <!-- Tension bars (14 pairs) -->
+            <g transform="translate(28,0)">
+              <!-- pair scores approximated -->
+              <rect x="0"   y="38" width="22" height="58" fill="var(--jade)" opacity=".7" rx="1"/>
+              <rect x="28"  y="22" width="22" height="74" fill="var(--jade)" opacity=".9" rx="1"/>
+              <rect x="56"  y="31" width="22" height="65" fill="var(--jade)" opacity=".7" rx="1"/>
+              <rect x="84"  y="14" width="22" height="82" fill="var(--red)" opacity=".8" rx="1"/>
+              <rect x="112" y="43" width="22" height="53" fill="var(--jade)" opacity=".65" rx="1"/>
+              <rect x="140" y="19" width="22" height="77" fill="var(--red)" opacity=".75" rx="1"/>
+              <rect x="168" y="26" width="22" height="70" fill="var(--jade)" opacity=".8" rx="1"/>
+              <rect x="196" y="34" width="22" height="62" fill="var(--jade)" opacity=".7" rx="1"/>
+              <rect x="224" y="8"  width="22" height="88" fill="var(--red)" opacity=".85" rx="1"/>
+              <rect x="252" y="48" width="22" height="48" fill="var(--gold)" opacity=".6" rx="1"/>
+              <rect x="280" y="29" width="22" height="67" fill="var(--jade)" opacity=".75" rx="1"/>
+              <rect x="308" y="17" width="22" height="79" fill="var(--red)" opacity=".8" rx="1"/>
+              <rect x="336" y="40" width="22" height="56" fill="var(--jade)" opacity=".65" rx="1"/>
+              <!-- Highlighted current pair -->
+              <rect x="364" y="22" width="22" height="74" fill="var(--jade)" opacity="1" rx="1" stroke="var(--jade-pale)" stroke-width="1.5"/>
+            </g>
+            <!-- Threshold line -->
+            <line x1="28" y1="36" x2="555" y2="36" stroke="var(--gold)" stroke-width=".8" stroke-dasharray="4 6" opacity=".4"/>
+            <text x="540" y="32" fill="var(--gold)" font-size="7" font-family="'Space Mono',monospace" opacity=".5">0.65</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Geospatial Panel -->
+      <div class="geo-panel">
+        <div class="geo-header">
+          <div class="geo-title">Geospatial Distribution · Panji Zone</div>
+          <div class="geo-controls">
+            <button class="geo-btn active">Insular</button>
+            <button class="geo-btn">Mainland</button>
+            <button class="geo-btn">Heat</button>
+            <button class="geo-btn">Flow</button>
+          </div>
+        </div>
+        <div class="geo-map-area">
+          <svg class="geo-svg-wrap" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- SEA abstracted silhouette / placeholder map -->
+            <rect width="600" height="200" fill="#07060A"/>
+            <!-- Grid -->
+            <defs>
+              <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(201,168,76,.04)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="600" height="200" fill="url(#grid)"/>
+            <!-- Abstract SEA region blobs -->
+            <ellipse cx="200" cy="100" rx="80" ry="50" fill="rgba(74,171,120,.08)" stroke="rgba(74,171,120,.2)" stroke-width="1"/>
+            <ellipse cx="350" cy="80"  rx="60" ry="35" fill="rgba(74,171,120,.06)" stroke="rgba(74,171,120,.15)" stroke-width="1"/>
+            <ellipse cx="450" cy="110" rx="50" ry="30" fill="rgba(74,171,120,.06)" stroke="rgba(74,171,120,.12)" stroke-width="1"/>
+            <ellipse cx="140" cy="140" rx="35" ry="20" fill="rgba(74,171,120,.05)" stroke="rgba(74,171,120,.1)" stroke-width="1"/>
+            <!-- Hot points (feudal marker concentration) -->
+            <circle cx="200" cy="95"  r="12" fill="var(--red)" opacity=".3"/>
+            <circle cx="200" cy="95"  r="6"  fill="var(--red)" opacity=".7"/>
+            <circle cx="200" cy="95"  r="2"  fill="white" opacity=".9"/>
+            <circle cx="350" cy="78"  r="8"  fill="var(--gold)" opacity=".35"/>
+            <circle cx="350" cy="78"  r="4"  fill="var(--gold)" opacity=".7"/>
+            <circle cx="350" cy="78"  r="1.5"fill="white" opacity=".9"/>
+            <circle cx="145" cy="142" r="5"  fill="var(--amerta)" opacity=".4"/>
+            <circle cx="145" cy="142" r="2.5"fill="var(--amerta)" opacity=".7"/>
+            <!-- Labels -->
+            <text x="180" y="90"  fill="rgba(240,232,213,.5)" font-size="7" font-family="'Space Mono',monospace">ID</text>
+            <text x="340" y="72"  fill="rgba(240,232,213,.5)" font-size="7" font-family="'Space Mono',monospace">TH</text>
+            <text x="132" y="138" fill="rgba(240,232,213,.5)" font-size="7" font-family="'Space Mono',monospace">VN</text>
+            <text x="440" y="106" fill="rgba(240,232,213,.4)" font-size="7" font-family="'Space Mono',monospace">KH</text>
+            <!-- Legend -->
+            <circle cx="18"  cy="180" r="4"  fill="var(--red)" opacity=".7"/>
+            <text x="26" y="184" fill="rgba(240,232,213,.4)" font-size="7" font-family="'Space Mono',monospace">High wangsit density</text>
+            <circle cx="150" cy="180" r="4"  fill="var(--gold)" opacity=".7"/>
+            <text x="158" y="184" fill="rgba(240,232,213,.4)" font-size="7" font-family="'Space Mono',monospace">Moderate tension</text>
+            <circle cx="270" cy="180" r="4"  fill="var(--amerta)" opacity=".7"/>
+            <text x="278" y="184" fill="rgba(240,232,213,.4)" font-size="7" font-family="'Space Mono',monospace">Contra corpus strong</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Refine Prompt Bar -->
+      <div>
+        <div style="font-family:var(--font-mono);font-size:.54rem;letter-spacing:.15em;color:var(--jade-dim);margin-bottom:.5rem;text-transform:uppercase">Refine · Add Context or Re-iterate</div>
+        <div class="refine-bar">
+          <input class="refine-input" type="text" placeholder="Add context, request deeper contra corpus, filter by region, or redirect the framing…" />
+          <button class="refine-btn">⚡ Refine Analysis</button>
+        </div>
+        <div class="ux-annotation" style="margin-top:.5rem">
+          <div class="ux-annotation-label">UX Note · Iterative Prompt</div>
+          The analyst can layer prompts: "focus only on Thailand context", "pull in Sejarah Melayu", "exclude social media — academic only", or "show me what changed since last week". Each refinement is logged as a version in the tension_map without overwriting the original pair.
+        </div>
+      </div>
+    </div>
+
+    <!-- ASIDE: Peer Queue + Dalang Rail -->
+    <div class="pengadukan-aside">
+      <div class="aside-title" style="color:var(--jade)">Peer Review Queue</div>
+      <div class="peer-queue-item pq-pending">
+        <div class="pq-pair-id">pair_kebijakan_ID_20260512_007</div>
+        <div class="pq-gap-label">Wangsit vs Dharma Contract</div>
+        <div class="pq-status"><div class="pq-status-dot"></div><div class="pq-status-text">PENDING REVIEW</div></div>
+      </div>
+      <div class="peer-queue-item pq-review">
+        <div class="pq-pair-id">pair_ekonomi_ID_20260510_003</div>
+        <div class="pq-gap-label">Sovereign AI vs Market Logic</div>
+        <div class="pq-status"><div class="pq-status-dot"></div><div class="pq-status-text">IN REVIEW — analyst_AR</div></div>
+      </div>
+      <div class="peer-queue-item pq-pending">
+        <div class="pq-pair-id">pair_sosial_ID_20260508_011</div>
+        <div class="pq-gap-label">Patron-client vs Maritime Commons</div>
+        <div class="pq-status"><div class="pq-status-dot"></div><div class="pq-status-text">PENDING REVIEW</div></div>
+      </div>
+      <div class="peer-queue-item pq-review">
+        <div class="pq-pair-id">pair_sosial_TH_20260507_002</div>
+        <div class="pq-gap-label">Royal legitimacy vs Dharmic contract</div>
+        <div class="pq-status"><div class="pq-status-dot"></div><div class="pq-status-text">IN REVIEW — analyst_DP</div></div>
+      </div>
+
+      <div style="height:1px;background:var(--rule)"></div>
+
+      <!-- Dalang trace -->
+      <div class="dalang-rail">
+        <div class="dalang-rail-header">
+          <span style="font-size:.9rem">🎭</span>
+          <div class="dalang-rail-title">Dalang · Agent Trace</div>
+        </div>
+        <div class="dalang-trace">
+          <div class="trace-line highlight">Query embedded · BGE-M3 · 1024-dim ✓</div>
+          <div class="trace-line">Searching amerta/public_arguments…</div>
+          <div class="trace-line highlight">14 candidates retrieved · threshold 0.65</div>
+          <div class="trace-line">Cross-querying amerta/contra_arguments…</div>
+          <div class="trace-line warn">⚠ Pararaton corpus thin on this domain</div>
+          <div class="trace-line">Nagarakretagama: 3 high-authority chunks</div>
+          <div class="trace-line highlight">Top pair: 0.73 cosine gap · writing tension_map</div>
+          <div class="trace-line">resolution_note field locked → human only</div>
+          <div class="trace-line" style="color:var(--violet)">— Dalang selesai. Deliberasi diserahkan.</div>
+        </div>
+      </div>
+
+      <div class="ux-annotation">
+        <div class="ux-annotation-label">UX Note · Dalang Rail</div>
+        The rail is read-only for the analyst. It shows the agent's reasoning process transparently — so the human knows exactly what the machine did before exercising judgment. This is Amerta's epistemic humility made visible.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     ROOM III · MANDALA
+     Live system dashboard
+══════════════════════════════════ -->
+<section class="room" id="room-mandala">
+  <div class="room-header">
+    <div class="room-header-left">
+      <div class="room-eyebrow">Room III · Penjuru Barat · Live</div>
+      <div class="room-title">Mandala</div>
+      <div class="room-subtitle">The radial view — collection health, news cycle momentum, activity feed, system pulse</div>
+    </div>
+    <div class="room-header-right">
+      <div>Last refresh: <span class="blink">●</span> live</div>
+      <div style="font-size:.52rem;opacity:.4">amerta:// · A-MRT v1.0</div>
+    </div>
+  </div>
+
+  <div class="mandala-body">
+    <!-- Top KPIs -->
+    <div class="mandala-grid-top">
+      <div class="mandala-kpi gold">
+        <div class="kpi-label">Public Args · Ingested</div>
+        <div class="kpi-value gold">48,712</div>
+        <div class="kpi-delta up">↑ +1,204 today</div>
+        <div class="kpi-trend">
+          <svg class="sparkline" width="100%" height="24" viewBox="0 0 120 24">
+            <polyline points="0,20 15,16 30,18 45,12 60,14 75,8 90,10 105,6 120,4" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity=".7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mandala-kpi jade">
+        <div class="kpi-label">Tension Pairs · Generated</div>
+        <div class="kpi-value jade">1,847</div>
+        <div class="kpi-delta up">↑ +87 this week</div>
+        <div class="kpi-trend">
+          <svg class="sparkline" width="100%" height="24" viewBox="0 0 120 24">
+            <polyline points="0,22 15,18 30,20 45,14 60,16 75,10 90,12 105,8 120,6" fill="none" stroke="var(--jade)" stroke-width="1.5" opacity=".7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mandala-kpi amerta">
+        <div class="kpi-label">Peer Reviews · Resolved</div>
+        <div class="kpi-value amerta">312</div>
+        <div class="kpi-delta up">↑ +12 this week</div>
+        <div class="kpi-trend">
+          <svg class="sparkline" width="100%" height="24" viewBox="0 0 120 24">
+            <polyline points="0,20 15,19 30,17 45,16 60,15 75,13 90,11 105,10 120,8" fill="none" stroke="var(--amerta)" stroke-width="1.5" opacity=".7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mandala-kpi violet">
+        <div class="kpi-label">Avg Tension Score</div>
+        <div class="kpi-value violet">0.68</div>
+        <div class="kpi-delta up">↑ epistemic divide widening</div>
+        <div class="kpi-trend">
+          <svg class="sparkline" width="100%" height="24" viewBox="0 0 120 24">
+            <polyline points="0,16 15,18 30,15 45,13 60,11 75,14 90,10 105,8 120,6" fill="none" stroke="var(--violet)" stroke-width="1.5" opacity=".7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mid grid: Collection health + News cycles + System mandala -->
+    <div class="mandala-grid-mid">
+
+      <!-- Collection health -->
+      <div class="mandala-panel">
+        <div class="mandala-panel-header">
+          <div class="mandala-panel-title gold">Qdrant Collections · Health</div>
+          <div style="font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim)">BGE-M3 · 1024d · COSINE</div>
+        </div>
+        <div class="mandala-panel-body">
+          <div class="coll-health-row">
+            <div class="coll-health-item"><div class="coll-name-label">public_arguments</div><div class="coll-bar"><div class="coll-fill gold" style="width:82%"></div></div><div class="coll-count">48,712</div></div>
+            <div class="coll-health-item"><div class="coll-name-label">contra_arguments</div><div class="coll-bar"><div class="coll-fill amerta" style="width:55%"></div></div><div class="coll-count">12,448</div></div>
+            <div class="coll-health-item"><div class="coll-name-label">tension_maps</div><div class="coll-bar"><div class="coll-fill jade" style="width:38%"></div></div><div class="coll-count">1,847</div></div>
+            <div class="coll-health-item"><div class="coll-name-label">entity_graph</div><div class="coll-bar"><div class="coll-fill violet" style="width:45%"></div></div><div class="coll-count">8,201</div></div>
+            <div class="coll-health-item"><div class="coll-name-label">news_cycles</div><div class="coll-bar"><div class="coll-fill gold" style="width:30%"></div></div><div class="coll-count">342</div></div>
+            <div class="coll-health-item"><div class="coll-name-label">peer_briefs</div><div class="coll-bar"><div class="coll-fill jade" style="width:17%"></div></div><div class="coll-count">312</div></div>
+            <div class="coll-health-item"><div class="coll-name-label">civil_society_registry</div><div class="coll-bar"><div class="coll-fill amerta" style="width:22%"></div></div><div class="coll-count">1,104</div></div>
+          </div>
+
+          <div style="height:1px;background:var(--rule)"></div>
+
+          <!-- Embedding status -->
+          <div>
+            <div style="font-family:var(--font-mono);font-size:.52rem;color:var(--parchment-dim);letter-spacing:.1em;margin-bottom:.6rem;text-transform:uppercase">Embedding Pipeline</div>
+            <div style="display:flex;flex-direction:column;gap:.45rem">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.56rem;color:var(--jade)"><span>● Ollama nomic-embed</span><span>active</span></div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.56rem;color:var(--parchment-dim)"><span>● BGE-M3 remote</span><span>standby</span></div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.56rem;color:var(--gold)"><span>⚠ Query vec issue</span><span>diagnosed</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- News cycle momentum -->
+      <div class="mandala-panel">
+        <div class="mandala-panel-header">
+          <div class="mandala-panel-title jade">News Cycles · Active Momentum</div>
+          <div style="font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim)">vel = Δ args/6h</div>
+        </div>
+        <div class="mandala-panel-body">
+          <div class="news-cycle-list">
+            <div class="news-cycle-item" style="--nc-color:var(--red)">
+              <div class="nc-bar"></div>
+              <div class="nc-body">
+                <div class="nc-id">NC_20260512_001 · ID · KEBIJAKAN</div>
+                <div class="nc-headline">Wacana "amanah rakyat" dalam isu pertahanan nasional</div>
+                <div class="nc-meta"><span class="nc-vel">vel: +847/6h 🔥</span><span>14.2K engmt</span><span>KOL1×3</span></div>
+              </div>
+            </div>
+            <div class="news-cycle-item" style="--nc-color:var(--gold)">
+              <div class="nc-bar"></div>
+              <div class="nc-body">
+                <div class="nc-id">NC_20260510_003 · ID · EKONOMI</div>
+                <div class="nc-headline">Sovereign AI vs ketergantungan platform asing</div>
+                <div class="nc-meta"><span class="nc-vel">vel: +312/6h</span><span>8.7K engmt</span><span>KOL1×1</span></div>
+              </div>
+            </div>
+            <div class="news-cycle-item" style="--nc-color:var(--amerta)">
+              <div class="nc-bar"></div>
+              <div class="nc-body">
+                <div class="nc-id">NC_20260508_007 · TH · GEOPOLITIK</div>
+                <div class="nc-headline">Royal institution legitimacy debate · Bangkok</div>
+                <div class="nc-meta"><span class="nc-vel">vel: +201/6h</span><span>4.1K engmt</span><span>KOL2×5</span></div>
+              </div>
+            </div>
+            <div class="news-cycle-item" style="--nc-color:var(--jade)">
+              <div class="nc-bar"></div>
+              <div class="nc-body">
+                <div class="nc-id">NC_20260506_002 · VN · SOSIAL</div>
+                <div class="nc-headline">Land rights and community displacement</div>
+                <div class="nc-meta"><span class="nc-vel">vel: +88/6h</span><span>2.3K engmt</span><span>KOL2×2</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Mandala + Activity Feed -->
+      <div class="mandala-panel">
+        <div class="mandala-panel-header">
+          <div class="mandala-panel-title amerta">System Pulse · A-MRT</div>
+        </div>
+        <div class="mandala-panel-body" style="align-items:center">
+          <div class="system-mandala-wrap">
+            <svg class="sys-mandala" width="180" height="180" viewBox="0 0 180 180">
+              <g id="sys-ring-outer">
+                <circle cx="90" cy="90" r="80" fill="none" stroke="#C9A84C" stroke-width=".5" stroke-dasharray="3 8" stroke-opacity=".3"/>
+                <circle cx="90" cy="10"  r="4" fill="none" stroke="#C9A84C" stroke-width=".8" opacity=".4"/>
+                <circle cx="170" cy="90" r="4" fill="none" stroke="#4aab78" stroke-width=".8" opacity=".4"/>
+                <circle cx="90" cy="170" r="4" fill="none" stroke="#8b78ff" stroke-width=".8" opacity=".4"/>
+                <circle cx="10"  cy="90" r="4" fill="none" stroke="#c0392b" stroke-width=".8" opacity=".4"/>
+              </g>
+              <g id="sys-ring-inner">
+                <circle cx="90" cy="90" r="55" fill="none" stroke="#4a7db5" stroke-width=".4" stroke-dasharray="2 6" stroke-opacity=".3"/>
+              </g>
+              <circle cx="90" cy="90" r="32" fill="rgba(201,168,76,.04)" stroke="#C9A84C" stroke-width="1" stroke-opacity=".3"/>
+              <text x="90" y="84" text-anchor="middle" fill="#f0d98a" font-family="'Cinzel',serif" font-size="9" letter-spacing="1">AMERTA</text>
+              <line x1="70" y1="90" x2="110" y2="90" stroke="#C9A84C" stroke-width=".4" opacity=".4"/>
+              <text x="90" y="100" text-anchor="middle" fill="#C9A84C" font-family="'Cormorant Garamond',serif" font-size="7" font-style="italic" opacity=".5">ꦄꦩꦽꦠ</text>
+              <!-- Radial arms to nodes -->
+              <line x1="90" y1="58"  x2="90" y2="10"  stroke="#C9A84C" stroke-width=".5" stroke-opacity=".2" stroke-dasharray="3 4"/>
+              <line x1="122" y1="90" x2="166" y2="90" stroke="#4aab78" stroke-width=".5" stroke-opacity=".2" stroke-dasharray="3 4"/>
+              <line x1="90" y1="122" x2="90" y2="166" stroke="#8b78ff" stroke-width=".5" stroke-opacity=".2" stroke-dasharray="3 4"/>
+              <line x1="58"  y1="90" x2="14"  y2="90" stroke="#c0392b" stroke-width=".5" stroke-opacity=".2" stroke-dasharray="3 4"/>
+            </svg>
+          </div>
+          <div style="display:flex;gap:1.5rem;justify-content:center;font-family:var(--font-mono);font-size:.52rem">
+            <div style="text-align:center;color:var(--gold)"><div style="font-size:.8rem">⛩</div>Keraton</div>
+            <div style="text-align:center;color:var(--jade)"><div style="font-size:.8rem">⛵</div>Pedagang</div>
+            <div style="text-align:center;color:var(--violet)"><div style="font-size:.8rem">🎭</div>Dalang</div>
+            <div style="text-align:center;color:var(--amerta)"><div style="font-size:.8rem">☀</div>Mandala</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Activity Feed -->
+    <div style="border:1px solid var(--rule);background:var(--bark)">
+      <div class="mandala-panel-header" style="padding:.8rem 1.4rem">
+        <div class="mandala-panel-title amerta">Live Activity Feed · A-MRT Operations</div>
+        <div style="font-family:var(--font-mono);font-size:.5rem;color:var(--parchment-dim)">auto-refresh 15s</div>
+      </div>
+      <div style="padding:1.2rem 1.4rem">
+        <div class="activity-feed">
+          <div class="activity-item"><div class="act-time">09:42</div><div class="act-body"><div class="act-text">47 new public_argument chunks ingested from X/Twitter · domain: kebijakan · ID</div><div class="act-tag ingest">INGEST</div></div></div>
+          <div class="activity-item"><div class="act-time">09:40</div><div class="act-body"><div class="act-text">Tension pair generated: wangsit_vs_dharma_contract · score 0.73 · sent to peer queue</div><div class="act-tag pair">PAIR</div></div></div>
+          <div class="activity-item"><div class="act-time">09:38</div><div class="act-body"><div class="act-text">Analyst AR resolved pair_ekonomi_ID_20260510_003 → VALID TENSION · brief triggered</div><div class="act-tag review">REVIEW</div></div></div>
+          <div class="activity-item"><div class="act-time">09:35</div><div class="act-body"><div class="act-text">⚠ civil_society_registry: 2 NGO entities flagged for capture risk · Dalang review required</div><div class="act-tag alert">ALERT</div></div></div>
+          <div class="activity-item"><div class="act-time">09:31</div><div class="act-body"><div class="act-text">News cycle NC_20260512_001 velocity spike: +847 args/6h — momentum threshold exceeded</div><div class="act-tag ingest">CYCLE</div></div></div>
+          <div class="activity-item"><div class="act-time">09:28</div><div class="act-body"><div class="act-text">BGE-M3 embedding batch complete: 312 chunks upserted to public_arguments</div><div class="act-tag ingest">EMBED</div></div></div>
+          <div class="activity-item"><div class="act-time">09:25</div><div class="act-body"><div class="act-text">Pair pair_sosial_TH_20260507_002 → in_review · assigned analyst DP</div><div class="act-tag review">QUEUE</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom annotation -->
+    <div class="ux-annotation">
+      <div class="ux-annotation-label">UX Proposal · Room III Design Notes</div>
+      The Mandala room is intentionally read-only. No inputs here — only observation. The radial SVG at center reflects the four archetypes in real-time orbit. KPI cards collapse to sparklines on narrow screens. The activity feed is the system's heartbeat — it should feel like watching the ocean, not a spreadsheet.
+      <br><br>
+      <strong>Additional consideration:</strong> A "Tension Heatmap by Domain × Country" could be added as a fifth panel below — a matrix grid showing where epistemic divide is most acute across the Panji zone. This would be the Mandala's most actionable output for a policy team briefing.
+    </div>
+  </div>
+</section>
+
+</div><!-- /canvas -->
+
+<script>
+// ═══════════════════════════════════════
+// ROOM SWITCHING
+// ═══════════════════════════════════════
+function switchRoom(id, tab) {
+  document.querySelectorAll('.room').forEach(r => r.classList.remove('active'));
+  document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('room-' + id).classList.add('active');
+  if (tab) tab.classList.add('active');
+  // Scroll to top
+  document.querySelector('.canvas').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════
+// TAG TOGGLE
+// ═══════════════════════════════════════
+function toggleTag(el, variant) {
+  el.classList.toggle('active');
+  if (variant) el.classList.toggle(variant);
+}
+
+// ═══════════════════════════════════════
+// ARCHETYPE BUTTONS
+// ═══════════════════════════════════════
+document.querySelectorAll('.archetype-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.archetype-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════
+// GEO CONTROLS
+// ═══════════════════════════════════════
+document.querySelectorAll('.geo-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.geo-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════
+// LIVE CLOCK
+// ═══════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+  const h = String(wib.getUTCHours()).padStart(2,'0');
+  const m = String(wib.getUTCMinutes()).padStart(2,'0');
+  const s = String(wib.getUTCSeconds()).padStart(2,'0');
+  const el = document.getElementById('live-clock');
+  if (el) el.textContent = `${h}:${m}:${s} WIB`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════════════════════════════════
+// FEUDAL MARKER LIVE ANIMATION
+// ═══════════════════════════════════════
+// Simulate live detection as user types
+const textarea = document.querySelector('.form-textarea');
+const bars = document.querySelectorAll('.radar-fill');
+const baseValues = [72, 58, 85, 31];
+if (textarea) {
+  textarea.addEventListener('input', () => {
+    const len = textarea.value.length;
+    bars.forEach((bar, i) => {
+      let v = baseValues[i] + (Math.sin(len * 0.1 + i) * 8);
+      v = Math.max(5, Math.min(95, v));
+      bar.style.width = v + '%';
+      bar.parentElement.previousElementSibling.lastChild.textContent = (v/100).toFixed(2);
+    });
+  });
+}
+</script>
+</body>
+</html>
