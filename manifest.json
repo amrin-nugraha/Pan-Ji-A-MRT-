@@ -2,7 +2,7 @@
   "name": "PAN-JI: Preceptive Arbitration Nexus",
   "short_name": "PAN-JI",
   "description": "Judgemental Integrative Nexus for Sovereign Intelligence",
-  "start_url": "./nexus-panji-main.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#07060A",
   "theme_color": "#C9A84C",
